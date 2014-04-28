@@ -1,6 +1,6 @@
 package react
 
-import akka.actor.{Props, ActorLogging, Actor, ActorSystem}
+import akka.actor._
 import scala.concurrent.duration._
 import scala.util.Random
 
@@ -14,50 +14,58 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object Main {
   def main(args: Array[String]) {
     val system = ActorSystem("ReactSystem")
-    system.actorOf(Props(classOf[Pricer], EUR_3M), name = "pricer-"+EUR_3M)
-    system.actorOf(Props(classOf[Pricer], EUR_6M), name = "pricer-"+EUR_6M)
+    val supervisor: ActorRef = system.actorOf(Props[Supervisor])
+    supervisor ! StartIndice(EUR_6M)
 
   }
 
+  case class StartIndice(indice: Indices)
+
+  case class StopIndice(indice: Indices)
+
+  class Supervisor extends Actor with ActorLogging {
+
+    var indices = Map[Indices, ActorRef]()
+
+    def receive = {
+      case StartIndice(indice) => {
+        context.actorOf(Props(classOf[Pricer], indice), name = "pricer-" + indice)
+        log.info("Start of context of pricing: " + indice)
+      }
+
+
+      case StopIndice(indice) => {
+        log.info("Stop of context of pricing: " + indice)
+        indices.get(indice).map {
+          ref => context.stop(ref)
+        }
+      }
+
+    }
+  }
 
   class Pricer(indice: Indices) extends Actor with ActorLogging {
     val client = context.actorOf(Props[Client])
-    val randomTimer = new Random().nextInt(10)
-    context.system.scheduler.schedule(0 seconds, randomTimer seconds, new Runnable {
+    context.system.scheduler.schedule(0 seconds, 1 seconds, new Runnable {
       def run() = {
-        client ! Message(new Random().nextInt(100))
-    }})
+        val price: Int = new Random().nextInt(100)
+        log.info("Produce price : " + price)
+        client ! Message(price)
+      }
+    })
 
 
     def receive = {
-      case ThrowException(message) => {
-        log.info("Exception message received : will detroy everything !" + message)
-        throw new RuntimeException(message)
-      }
-      case StrMessage(msg) => {
-        log.info("Pricer "+indice+ "receive message : "+msg)
-      }
-
+      case _ => {}
     }
   }
 
   class Client extends Actor with ActorLogging {
     def receive = {
-      case Message(price) => {
-
-        log.info("Receive " + price)
-        if(price > 7) {
-          log.info("Killed !")
-          context.stop(self)
-        }
-      }
+      case _ => ()
     }
   }
 
-  case class StrMessage(msg: String)
   case class Message(price: Int)
-
-  case class ThrowException(message: String)
-
 
 }
