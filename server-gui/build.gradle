@@ -1,0 +1,15 @@
+// 'idea-scala-facet' plugin includes both, 'idea' and 'scala' plugins
+apply plugin: 'java'
+apply plugin: 'idea'
+
+repositories{
+    mavenCentral()
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+dependencies{
+    compile 'com.netflix.rxjava:rxjava-core:0.18.+'
+    compile 'org.webbitserver:webbit:0.4.+'
+}
