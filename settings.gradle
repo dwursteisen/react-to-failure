@@ -15,5 +15,5 @@ include 'shared'
 include 'api'
 include 'services:webservice'
 */
-
+include 'server'
 rootProject.name = 'react-failure'
