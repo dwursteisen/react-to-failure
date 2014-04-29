@@ -7,6 +7,7 @@ repositories{
 
 dependencies{
 	compile group: 'com.typesafe.akka', name: 'akka-actor_2.10', version: '2.3.+'
+    compile 'org.webbitserver:webbit:0.4.+'
 
 	scalaTools   group: 'org.scala-lang', name: 'scala-library', version: '2.10.+'
     scalaTools  group: 'org.scala-lang', name: 'scala-compiler', version: '2.10.+'

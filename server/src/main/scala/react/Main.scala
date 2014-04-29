@@ -5,6 +5,7 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.webbitserver.{WebSocketConnection, BaseWebSocketHandler, WebServers}
 
 /**
  * User: david.wursteisen
@@ -61,11 +62,44 @@ object Main {
   }
 
   class Client extends Actor with ActorLogging {
+
+    val ws = WebServers.createWebServer(4444).add("/context/?", new BaseWebSocketHandler() {
+
+
+      override def onMessage(connection: WebSocketConnection, msg: String) = {
+
+      }
+
+      override def onClose(connection: WebSocketConnection) = {
+        self ! ByeBye(connection)
+      }
+
+      override def onOpen(connection: WebSocketConnection) = {
+        System.out.println("connection open")
+
+        self ! Hello(connection)
+      }
+    }).start().get()
+
+    var clients = Seq[WebSocketConnection]()
+
     def receive = {
+      case Hello(ctx) => clients = clients :+ ctx
+      case ByeBye(ctx) => clients = clients.diff(Seq(ctx))
+      case Message(price) => {
+        System.out.println("Send price => " + price)
+        clients.foreach((ctx) => ctx.send("{\'price\': %d}".format(price)))
+      }
       case _ => ()
     }
   }
 
+
   case class Message(price: Int)
+
+
+  case class Hello(connection: WebSocketConnection)
+
+  case class ByeBye(connection: WebSocketConnection)
 
 }
