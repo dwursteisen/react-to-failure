@@ -3,12 +3,15 @@ package react.gui;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import eu.hansolo.enzo.common.SymbolType;
+import eu.hansolo.enzo.onoffswitch.IconSwitch;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.webbitserver.BaseWebSocketHandler;
 import org.webbitserver.WebSocketConnection;
@@ -42,6 +45,14 @@ public class Main extends Application {
 
         StackPane root = new StackPane();
         root.getChildren().add(btn);
+
+        IconSwitch iconSwitchSymbol = new IconSwitch();
+        iconSwitchSymbol.setSelected(true);
+        iconSwitchSymbol.setSymbolType(SymbolType.POWER);
+        iconSwitchSymbol.setSymbolColor(Color.web("#34495e"));
+
+        root.getChildren().add(iconSwitchSymbol);
+
         primaryStage.setScene(new Scene(root, 300, 250));
         primaryStage.show();
     }

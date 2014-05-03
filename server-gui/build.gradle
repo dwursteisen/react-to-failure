@@ -12,4 +12,5 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies{
     compile 'com.netflix.rxjava:rxjava-core:0.18.+'
     compile 'org.webbitserver:webbit:0.4.+'
+    compile 'eu.hansolo.enzo:Enzo:0.1'
 }
